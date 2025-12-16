@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('media', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('slug');
-            $table->boolean('status')->default(true);
+
+            $table->string('disk')->default('public')->index();
+            $table->text('path');
+            $table->string('mime')->nullable()->index();
+            $table->unsignedBigInteger('size')->nullable();
+
+            $table->string('uploaded_by');
+
             $table->timestamps();
-            $table->unique(['slug', 'deleted_at']);
+            $table->index(['disk','uploaded_by']);
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('media');
     }
 };

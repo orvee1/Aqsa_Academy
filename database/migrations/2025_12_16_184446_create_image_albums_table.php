@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('image_albums', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('slug');
-            $table->boolean('status')->default(true);
+            $table->string('title');
+            $table->boolean('status')->default(true)->index();
             $table->timestamps();
-            $table->unique(['slug', 'deleted_at']);
         });
     }
 
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('image_albums');
     }
 };

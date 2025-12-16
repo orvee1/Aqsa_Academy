@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('social_links', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('slug');
-            $table->boolean('status')->default(true);
+            $table->string('platform'); // facebook/youtube/...
+            $table->text('url');
+            $table->integer('position')->default(0)->index();
+            $table->boolean('status')->default(true)->index();
             $table->timestamps();
-            $table->unique(['slug', 'deleted_at']);
+
+            $table->index(['status', 'position']);
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('social_links');
     }
 };
