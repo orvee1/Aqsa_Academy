@@ -9,16 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-     public function up(): void
+    public function up(): void
     {
-        Schema::create('tenants', function (Blueprint $table) {
+        Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('domain')->nullable()->unique();
-            $table->unsignedTinyInteger('status')->default(1);
+            $table->string('key')->unique();
+            $table->string('label');
+            $table->string('group')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
-            $table->softDeletes();
+            $table->index(['group', 'status']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tenants');
+        Schema::dropIfExists('permissions');
     }
 };

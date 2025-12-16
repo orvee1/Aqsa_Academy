@@ -1,39 +1,41 @@
 <?php
-
+use App\Http\Controllers\Admin\InstituteController;
+use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\Admin\PermissionController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Super\TenantController;
-use App\Http\Controllers\Super\UserController as SuperUserController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\InstituteProfileController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', fn () => view('welcome'));
 
-Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Roles Routes
+    Route::resource('roles', RoleController::class);
+    Route::patch('roles/{role}/toggle', [RoleController::class, 'toggle'])->name('roles.toggle');
 
-        Route::get('/institute', [InstituteProfileController::class, 'edit'])->name('institute.edit');
-        Route::put('/institute', [InstituteProfileController::class, 'update'])->name('institute.update');
+    // User Routes
+    Route::resource('users', UserController::class);
+    Route::patch('users/{user}/toggle-super', [UserController::class, 'toggleSuper'])->name('users.toggle-super');
 
-        // --- module stubs (menu items) ---
-        Route::view('/notices', 'admin.stub', ['title' => 'নোটিশবোর্ড'])->name('notices');
-        Route::view('/members', 'admin.stub', ['title' => 'মেম্বার'])->name('members');
-        Route::view('/pages', 'admin.stub', ['title' => 'পেজ তৈরি করুন'])->name('pages');
-        Route::view('/posts', 'admin.stub', ['title' => 'পোস্ট তৈরি করুন'])->name('posts');
-        Route::view('/banners', 'admin.stub', ['title' => 'ব্যানার তৈরি করুন'])->name('banners');
-        Route::view('/events', 'admin.stub', ['title' => 'ইভেন্ট'])->name('events');
-        Route::view('/achievements', 'admin.stub', ['title' => 'আমাদের অর্জন'])->name('achievements');
-        Route::view('/image-gallery', 'admin.stub', ['title' => 'ইমেজ গ্যালারি'])->name('image_gallery');
-        Route::view('/video-gallery', 'admin.stub', ['title' => 'ভিডিও গ্যালারি'])->name('video_gallery');
-        Route::view('/sidebar', 'admin.stub', ['title' => 'সাইডবার ম্যানেজ'])->name('sidebar');
-        Route::view('/footer', 'admin.stub', ['title' => 'ফুটার ম্যানেজ'])->name('footer');
-    });
-});
+    // Permission Routes
+    Route::resource('permissions', PermissionController::class);
+    Route::patch('permissions/{permission}/toggle', [PermissionController::class, 'toggle'])->name('permissions.toggle');
+    // role wise permission assign
+    Route::get('roles/{role}/permissions', [RolePermissionController::class, 'edit'])->name('roles.permissions.edit');
+    Route::put('roles/{role}/permissions', [RolePermissionController::class, 'update'])->name('roles.permissions.update');
 
-Route::middleware(['auth', 'verified', 'super'])->prefix('super')->name('super.')->group(function () {
-    Route::resource('tenants', TenantController::class);
-    Route::resource('users', SuperUserController::class)->only(['index','create','store','edit','update']);
+    // Institute Routes
+    Route::resource('institutes', InstituteController::class);
+    Route::patch('institutes/{institute}/toggle', [InstituteController::class, 'toggle'])->name('institutes.toggle');
+
+    // Notice Routes
+    Route::resource('notices', NoticeController::class)->except(['show']);
+
+    Route::patch('notices/{notice}/toggle-hide', [NoticeController::class,'toggleHide'])->name('notices.toggle-hide');
+    Route::patch('notices/{notice}/toggle-publish', [NoticeController::class,'togglePublish'])->name('notices.toggle-publish');
+    Route::patch('notices/{notice}/toggle-pin', [NoticeController::class,'togglePin'])->name('notices.toggle-pin');
 });
 
 require __DIR__.'/auth.php';

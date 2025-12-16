@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
+            $table->string('phone');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_super_admin')->default(false);
-            $table->index(['tenant_id', 'is_super_admin']);
+            $table->unsignedBigInteger('role_id');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+            $table->unique(['email', 'deleted_at']);
+            $table->unique(['phone', 'deleted_at']);
         });
     }
 

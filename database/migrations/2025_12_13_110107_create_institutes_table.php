@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('institutes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('name');
             $table->string('slogan')->nullable();
             $table->string('address')->nullable();
@@ -27,14 +26,13 @@ return new class extends Migration
             $table->string('mobile_1', 50)->nullable();
             $table->string('mobile_2', 50)->nullable();
 
-            $table->string('link_1')->nullable();
-            $table->string('link_2')->nullable();
-            $table->string('link_3')->nullable();
-
+            $table->text('link_1')->nullable();
+            $table->text('link_2')->nullable();
+            $table->text('link_3')->nullable();
+            $table->boolean('status')->default(true)->index();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique('tenant_id'); // 1 institute per tenant
         });
     }
 
