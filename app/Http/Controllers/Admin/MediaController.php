@@ -73,4 +73,50 @@ class MediaController extends Controller
 
         return back()->with('success', 'Media deleted.');
     }
+
+    public function picker(Request $request)
+{
+    $q = Media::query()->with('uploader:id,name');
+
+    if ($request->filled('q')) {
+        $k = "%{$request->q}%";
+        $q->where('path','like',$k)->orWhere('mime','like',$k);
+    }
+
+    if ($request->filled('disk')) $q->where('disk', $request->disk);
+
+    if ($request->filled('type')) {
+        if ($request->type === 'image') $q->where('mime','like','image/%');
+        if ($request->type === 'pdf') $q->where('mime','like','application/pdf%');
+    }
+
+    $media = $q->latest('id')->paginate(18)->appends($request->query());
+
+    return response()->json([
+        'data' => $media->getCollection()->map(function($m){
+            $url = Storage::disk($m->disk)->url($m->path);
+            return [
+                'id' => $m->id,
+                'disk' => $m->disk,
+                'path' => $m->path,
+                'url' => $url,
+                'mime' => $m->mime,
+                'is_image' => is_string($m->mime) && str_starts_with($m->mime,'image/'),
+                'filename' => basename($m->path),
+                'size_kb' => $m->size ? round($m->size/1024,1) : null,
+                'uploader' => $m->uploader?->name,
+            ];
+        })->values(),
+        'meta' => [
+            'current_page' => $media->currentPage(),
+            'last_page' => $media->lastPage(),
+            'total' => $media->total(),
+        ],
+        'links' => [
+            'prev' => $media->previousPageUrl(),
+            'next' => $media->nextPageUrl(),
+        ],
+    ]);
+}
+
 }
