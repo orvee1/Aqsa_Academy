@@ -23,9 +23,18 @@ use App\Http\Controllers\Admin\SocialLinkController;
 use App\Http\Controllers\Admin\StatementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VideoItemController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Client\AchievementController as ClientAchievementController;
+use App\Http\Controllers\Client\EventController as ClientEventController;
+use App\Http\Controllers\Client\GalleryController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\NoticeController as ClientNoticeController;
+use App\Http\Controllers\Client\PageController as ClientPageController;
+use App\Http\Controllers\Client\PostController as ClientPostController;
+use App\Http\Controllers\Client\VideoController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ClientHomeController::class, 'index'])->name('client.home');
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
 
 Route::get('/notice-board', [ClientNoticeController::class, 'index'])->name('client.notices.index');
 Route::get('/notice/{slug}', [ClientNoticeController::class, 'show'])->name('client.notices.show');
@@ -41,10 +50,10 @@ Route::get('/events/{slug}', [ClientEventController::class, 'show'])->name('clie
 
 Route::get('/achievements', [ClientAchievementController::class, 'index'])->name('client.achievements.index');
 
-Route::get('/gallery', [ClientGalleryController::class, 'index'])->name('client.gallery.index');
-Route::get('/gallery/album/{album}', [ClientGalleryController::class, 'album'])->name('client.gallery.album');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('client.gallery.index');
+Route::get('/gallery/album/{album}', [GalleryController::class, 'album'])->name('client.gallery.album');
 
-Route::get('/videos', [ClientVideoController::class, 'index'])->name('client.videos.index');
+Route::get('/videos', [VideoController::class, 'index'])->name('client.videos.index');
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard Route

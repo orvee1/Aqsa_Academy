@@ -7,7 +7,7 @@
         {{-- Left main --}}
         <div class="lg:col-span-9 space-y-4">
 
-            {{-- Slider area --}}
+            {{-- Slider --}}
             <div class="bg-white border rounded shadow overflow-hidden">
                 @php $first = $sliders->first(); @endphp
                 @if ($first)
@@ -17,7 +17,7 @@
                 @endif
             </div>
 
-            {{-- Notice board block --}}
+            {{-- Notice board --}}
             <div class="bg-white border rounded shadow p-4">
                 <div class="flex items-center justify-between mb-3">
                     <div class="font-semibold">নোটিশ বোর্ড</div>
@@ -110,11 +110,22 @@
                     @foreach ($videos as $v)
                         <div class="border rounded overflow-hidden">
                             <div class="aspect-video bg-black">
-                                <iframe class="w-full h-full"
-                                    src="{{ \Illuminate\Support\Str::contains($v->youtube_url, 'embed')
-                                        ? $v->youtube_url
-                                        : 'https://www.youtube.com/embed/' . \Illuminate\Support\Str::after($v->youtube_url, 'v=') }}"
-                                    title="{{ $v->title }}" frameborder="0"
+                                @php
+                                    // simple extractor
+                                    $u = $v->youtube_url;
+                                    $vid = null;
+                                    if (str_contains($u, 'embed/')) {
+                                        $vid = \Illuminate\Support\Str::after($u, 'embed/');
+                                    } elseif (str_contains($u, 'youtu.be/')) {
+                                        $vid = \Illuminate\Support\Str::after($u, 'youtu.be/');
+                                    } elseif (str_contains($u, 'v=')) {
+                                        $vid = \Illuminate\Support\Str::after($u, 'v=');
+                                    }
+                                    $vid = $vid ? strtok($vid, '&?') : null;
+                                    $embed = $vid ? "https://www.youtube.com/embed/{$vid}" : $u;
+                                @endphp
+                                <iframe class="w-full h-full" src="{{ $embed }}" title="{{ $v->title }}"
+                                    frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowfullscreen></iframe>
                             </div>
@@ -149,7 +160,7 @@
                 @endif
             </div>
 
-            {{-- Govt helplines (static placeholders; আপনি image replace করবেন) --}}
+            {{-- Helplines (static block; future module বানাতে চাইলে বলবেন) --}}
             <div class="bg-white border rounded shadow p-3">
                 <div class="text-sm font-semibold mb-2">সরকারি হেল্পলাইন</div>
                 <div class="space-y-2 text-sm text-slate-700">
@@ -160,7 +171,6 @@
                 </div>
             </div>
 
-            {{-- Important links --}}
             <div class="bg-white border rounded shadow p-3">
                 <div class="text-sm font-semibold mb-2">গুরুত্বপূর্ণ লিংক</div>
                 <div class="space-y-2 text-sm">

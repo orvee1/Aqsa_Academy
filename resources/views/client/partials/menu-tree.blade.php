@@ -1,30 +1,7 @@
 @php
     $it = $node['item'];
     $children = $node['children'] ?? [];
-
-    // Resolve URL based on type
-    $url = '#';
-    if ($it->type === 'url' && $it->url) {
-        $url = $it->url;
-    }
-
-    if ($it->type === 'page' && $it->page_id) {
-        $page = \App\Models\Page::find($it->page_id);
-        if ($page) {
-            $url = route('client.pages.show', $page->slug);
-        }
-    }
-
-    if ($it->type === 'post_category' && $it->post_category_id) {
-        $cat = \App\Models\PostCategory::find($it->post_category_id);
-        if ($cat) {
-            $url = route('client.posts.category', $cat->slug);
-        }
-    }
-
-    if ($it->type === 'route' && $it->route_name && \Illuminate\Support\Facades\Route::has($it->route_name)) {
-        $url = route($it->route_name);
-    }
+    $url = $it->resolved_url ?? '#';
 @endphp
 
 <li class="relative group">
@@ -40,7 +17,6 @@
         <ul
             class="hidden group-hover:block absolute left-0 top-full mt-1 min-w-56 bg-white text-slate-800 rounded shadow border overflow-hidden z-20">
             @foreach ($children as $ch)
-                @php $child = $ch['item']; @endphp
                 <li class="border-b last:border-b-0">
                     @include('client.partials.menu-tree', ['node' => $ch])
                 </li>
