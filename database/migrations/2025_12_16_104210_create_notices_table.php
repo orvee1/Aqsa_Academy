@@ -25,13 +25,13 @@ return new class extends Migration
             $table->boolean('is_hidden')->default(false); // hide/unhide
             $table->boolean('is_pinned')->default(false);
 
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('created_by')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
             $table->unique(['slug', 'deleted_at']);
 
-            $table->index(['is_published','is_hidden','published_at']);
+            $table->index(['is_published','is_hidden','published_at','created_by','expires_at']);
         });
     }
 

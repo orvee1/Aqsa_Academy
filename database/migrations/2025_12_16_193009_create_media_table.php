@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('mime')->nullable()->index();
             $table->unsignedBigInteger('size')->nullable();
 
-            $table->string('uploaded_by');
+            $table->unsignedBigInteger('uploaded_by')->nullable()->index();
 
             $table->timestamps();
             $table->index(['disk','uploaded_by']);

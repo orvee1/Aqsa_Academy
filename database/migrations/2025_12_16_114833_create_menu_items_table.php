@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
-            $table->string('menu_id');
-            $table->string('parent_id');
+
+            $table->unsignedBigInteger('menu_id')->index();
+            $table->unsignedBigInteger('parent_id')->nullable()->index();
 
             $table->string('label_bn');
             $table->string('label_en')->nullable();
 
             $table->enum('type', ['url', 'page', 'post_category', 'route'])->default('url');
             $table->text('url')->nullable();
-            $table->unsignedBigInteger('page_id')->nullable();
-            $table->unsignedBigInteger('post_category_id')->nullable();
+            $table->unsignedBigInteger('page_id')->nullable()->index();
+            $table->unsignedBigInteger('post_category_id')->nullable()->index();
             $table->string('route_name')->nullable();
 
             $table->integer('position')->default(0)->index();
@@ -30,7 +31,6 @@ return new class extends Migration
             $table->boolean('status')->default(true)->index();
 
             $table->timestamps();
-
             $table->index(['menu_id', 'parent_id', 'position']);
         });
 

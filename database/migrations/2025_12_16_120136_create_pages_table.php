@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'published'])->default('published');
             $table->timestamp('published_at')->nullable();
 
-            $table->string('created_by');
+            $table->unsignedBigInteger('created_by')->nullable()->index();
 
             $table->timestamps();
             $table->softDeletes();

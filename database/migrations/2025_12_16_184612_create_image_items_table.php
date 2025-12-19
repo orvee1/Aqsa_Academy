@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('image_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('album_id')->constrained('image_albums')->cascadeOnDelete();
+            $table->unsignedBigInteger('album_id');
 
             $table->string('title')->nullable();
             $table->text('image_path');

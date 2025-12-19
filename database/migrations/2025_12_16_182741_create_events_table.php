@@ -25,12 +25,12 @@ return new class extends Migration
             $table->string('cover_image_path')->nullable();
 
             $table->enum('status', ['draft', 'published'])->default('published');
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('created_by')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
             $table->unique(['slug','deleted_at']);
-            $table->index(['status', 'event_date']);
+            $table->index(['status', 'event_date','created_by']);
         });
     }
 
