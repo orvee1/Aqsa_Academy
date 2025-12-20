@@ -28,7 +28,7 @@ class BaseClientController extends Controller
 
     protected function common(): array
     {
-        $institute = Institute::latest('id')->first();
+        $institute = Institute::where('status',1)->latest('id')->first();
 
         // Header menu
         $headerMenu = Menu::where('location', 'header')->where('status', true)->first();

@@ -198,7 +198,7 @@
             <div class="bg-white rounded-xl shadow p-5">
                 <div class="font-semibold text-slate-800 mb-3">Quick Actions</div>
                 <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ route('admin.notices.create') }}"
+                    <a href="{{ route('admin.notices.index') }}"
                         class="px-3 py-2 rounded border hover:bg-slate-50 text-sm">+ Notice</a>
                     <a href="{{ route('admin.posts.create') }}"
                         class="px-3 py-2 rounded border hover:bg-slate-50 text-sm">+ Post</a>

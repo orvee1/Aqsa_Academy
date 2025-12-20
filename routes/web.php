@@ -78,7 +78,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::patch('institutes/{institute}/toggle', [InstituteController::class, 'toggle'])->name('institutes.toggle');
 
     // Notice Routes
-    Route::resource('notices', NoticeController::class)->except(['show']);
+    Route::resource('notices', NoticeController::class)->except(['show','create']);
 
     Route::patch('notices/{notice}/toggle-hide', [NoticeController::class, 'toggleHide'])->name('notices.toggle-hide');
     Route::patch('notices/{notice}/toggle-publish', [NoticeController::class, 'togglePublish'])->name('notices.toggle-publish');
