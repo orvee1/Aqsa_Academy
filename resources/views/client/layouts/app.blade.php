@@ -141,6 +141,16 @@
     </footer>
 
     @stack('scripts')
+    <script>
+        function toggleMenu(btn) {
+            const li = btn.closest('li');
+            const submenu = li.querySelector(':scope > ul.submenu');
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+            }
+        }
+    </script>
+
 </body>
 
 </html>
