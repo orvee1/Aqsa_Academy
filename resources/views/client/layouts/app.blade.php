@@ -13,39 +13,67 @@
 
 <body class="bg-slate-100 text-slate-900">
 
-    {{-- TOP INFO BAR --}}
-    <div class="bg-[#0b5c6b] text-white">
-        <div class="max-w-6xl mx-auto px-3 py-2 text-xs flex flex-wrap gap-x-6 gap-y-1 items-center justify-between">
-            <div class="flex flex-wrap gap-x-6 gap-y-1">
-                <div>ইআইআইএনঃ <span class="font-semibold">{{ $institute->eiin ?? '—' }}</span></div>
-                <div>স্কুল কোডঃ <span class="font-semibold">{{ $institute->school_code ?? '—' }}</span></div>
-                <div>কলেজ কোডঃ <span class="font-semibold">{{ $institute->college_code ?? '—' }}</span></div>
+    {{-- TOP THIN BAR (screenshot style) --}}
+    <div class="bg-[#d2c56a] text-slate-900">
+        <div class="max-w-6xl mx-auto px-3 py-1 text-xs flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-4">
+                <div>School Code: <span class="font-semibold">{{ $institute->school_code ?? '—' }}</span></div>
+                <div>EIIN: <span class="font-semibold">{{ $institute->eiin ?? '—' }}</span></div>
             </div>
-            <div class="flex flex-wrap gap-x-6 gap-y-1">
-                <div>ফোনঃ <span class="font-semibold">{{ $institute->phone_1 ?? ($institute->phone_2 ?? '—') }}</span>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1">
+                    <span>🕒</span> <span>{{ now()->format('h:i:s A') }}</span>
                 </div>
-                <div>মোবাইলঃ <span
-                        class="font-semibold">{{ $institute->mobile_1 ?? ($institute->mobile_2 ?? '—') }}</span></div>
+                <div class="flex items-center gap-1">
+                    <span>📅</span> <span>{{ now()->format('d/m/Y') }}</span>
+                </div>
+
+                <a href="{{ config('app.online_apply_url') ?? '#' }}"
+                    class="bg-[#0a5160] text-white px-3 py-1 rounded hover:bg-[#083f4b]">
+                    অনলাইনে আবেদন
+                </a>
             </div>
         </div>
     </div>
 
-    {{-- HEADER --}}
+    {{-- BIG HEADER (logo + title over banner) --}}
     <div class="bg-[#0a5160] text-white">
-        <div class="max-w-6xl mx-auto px-3 py-4 flex items-center gap-3">
-            <div class="w-14 h-14 rounded bg-white/10 flex items-center justify-center overflow-hidden">
-                <span class="text-2xl font-bold">🏫</span>
+        <div class="max-w-6xl mx-auto px-3 py-3 grid md:grid-cols-12 gap-3 items-center">
+            <div class="md:col-span-2 flex items-center gap-3">
+                <div class="w-16 h-16 rounded bg-white/10 overflow-hidden flex items-center justify-center">
+                    @if (!empty($institute->logo_path))
+                        <img src="{{ asset('storage/' . $institute->logo_path) }}" class="w-full h-full object-cover"
+                            alt="logo">
+                    @else
+                        <span class="text-2xl">🏫</span>
+                    @endif
+                </div>
             </div>
-            <div class="leading-tight">
-                <div class="text-2xl font-bold">{{ $institute->name ?? 'Institute Name' }}</div>
-                <div class="text-sm text-white/80">{{ $institute->slogan ?? ($institute->address ?? '') }}</div>
+
+            <div class="md:col-span-10 relative overflow-hidden rounded">
+                {{-- banner --}}
+                <div class="h-20 md:h-24 bg-[#083f4b]">
+                    @if (!empty($institute->header_banner_path))
+                        <img src="{{ asset('storage/' . $institute->header_banner_path) }}"
+                            class="w-full h-full object-cover opacity-70" alt="">
+                    @endif
+                </div>
+
+                {{-- overlay title --}}
+                <div class="absolute inset-0 flex items-center px-3">
+                    <div class="leading-tight">
+                        <div class="text-xl md:text-2xl font-bold">{{ $institute->name ?? 'Institute Name' }}</div>
+                        <div class="text-sm text-white/80">{{ $institute->slogan ?? ($institute->address ?? '') }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         {{-- NAV MENU --}}
-        <div class="border-t border-white/10 bg-[#083f4b]">
+        <div class="bg-[#083f4b] border-t border-white/10">
             <div class="max-w-6xl mx-auto px-3">
-                <ul class="flex flex-wrap items-center gap-2 py-2 text-white text-sm">
+                <ul class="flex flex-wrap items-center gap-1 py-2 text-white text-sm">
                     @foreach ($menuTree as $node)
                         @include('client.partials.menu-tree', ['node' => $node])
                     @endforeach
@@ -53,7 +81,27 @@
             </div>
         </div>
     </div>
+    {{-- MARQUEE NOTICE STRIP --}}
+    @php
+        // HomeController থেকে $notices পাঠানো হচ্ছে—তাই layout এ সব পেজে না চাইলে
+        // শুধু home view এর উপরে বসাও; নাহলে BaseClientController common এ "latestNotices" যোগ করো।
+    @endphp
 
+    @if (!empty($notices) && $notices->count())
+        <div class="bg-white border-b">
+            <div class="max-w-6xl mx-auto px-3 py-2 text-sm flex gap-3 items-center">
+                <span class="bg-[#0a5160] text-white px-3 py-1 rounded text-xs font-semibold">নোটিশ</span>
+                <marquee behavior="scroll" direction="left" scrollamount="5">
+                    @foreach ($notices->take(8) as $n)
+                        <a class="mr-8 hover:underline text-slate-700"
+                            href="{{ route('client.notices.show', $n->slug) }}">
+                            {{ $n->title }}
+                        </a>
+                    @endforeach
+                </marquee>
+            </div>
+        </div>
+    @endif
     {{-- PAGE CONTENT --}}
     <main class="max-w-6xl mx-auto px-3 py-5">
         @yield('content')
