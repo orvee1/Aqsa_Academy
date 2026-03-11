@@ -22,7 +22,9 @@
             if (!$url) {
                 return null;
             }
+
             $id = null;
+
             if (str_contains($url, 'embed/')) {
                 $id = Str::after($url, 'embed/');
             } elseif (str_contains($url, 'youtu.be/')) {
@@ -30,177 +32,300 @@
             } elseif (str_contains($url, 'v=')) {
                 $id = Str::after($url, 'v=');
             }
+
             return $id ? strtok($id, '&?') : null;
         };
+
+        $first = $sliders?->first();
+        $quickLinks = $importantLinks ?? [];
+
+        $noticeCount = $notices?->count() ?? 0;
+        $eventCount = $events?->count() ?? 0;
+        $achievementCount = $achievements?->count() ?? 0;
+        $videoCount = $videos?->count() ?? 0;
     @endphp
 
     <div class="grid lg:grid-cols-12 gap-4">
 
-        {{-- LEFT MAIN --}}
+        {{-- LEFT CONTENT --}}
         <div class="lg:col-span-9 space-y-4">
 
-            {{-- Slider --}}
-            <div class="bg-white border rounded shadow overflow-hidden">
-                @php $first = $sliders?->first(); @endphp
-                @if ($first && $img($first->image_path))
-                    <img src="{{ $img($first->image_path) }}" class="w-full h-[360px] object-cover" alt="">
-                @else
-                    <div class="h-[360px] flex items-center justify-center text-slate-500">No slider image</div>
-                @endif
-            </div>
+            {{-- TOP AREA --}}
+            <div class="grid md:grid-cols-12 gap-4">
 
-            {{-- Notice board --}}
-            <div class="bg-white border rounded shadow p-4">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="font-semibold">নোটিশ বোর্ড</div>
-                    <a href="{{ route('client.notices.index') }}" class="text-sm text-emerald-700 hover:underline">সব
-                        নোটিশ</a>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="text-left text-slate-600 border-b">
-                                <th class="py-2">শিরোনাম</th>
-                                <th class="py-2 w-28">তারিখ</th>
-                                <th class="py-2 w-24 text-right">ভিউ</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            @forelse($notices as $n)
-                                <tr class="hover:bg-slate-50">
-                                    <td class="py-2">
-                                        <a class="hover:underline" href="{{ route('client.notices.show', $n->slug) }}">
-                                            {{ $n->title }}
-                                            @if ($n->is_pinned)
-                                                <span class="ml-1 text-xs text-rose-600">★</span>
-                                            @endif
-                                        </a>
-                                    </td>
-                                    <td class="py-2 text-slate-600">
-                                        {{ $n->published_at?->format('d.m.Y') ?? $n->created_at->format('d.m.Y') }}
-                                    </td>
-                                    <td class="py-2 text-right">
-                                        <a class="inline-flex items-center justify-center px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
-                                            href="{{ route('client.notices.show', $n->slug) }}">
-                                            View
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="py-3 text-slate-500">No notices found.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Upcoming events --}}
-            <div class="bg-white border rounded shadow p-4">
-                <div class="font-semibold text-center mb-3">Upcoming Events</div>
-
-                <div class="grid sm:grid-cols-2 gap-3">
-                    @forelse($events as $e)
-                        <a href="{{ route('client.events.show', $e->slug) }}"
-                            class="border rounded overflow-hidden hover:bg-slate-50 transition">
-                            <div class="h-32 bg-slate-100 overflow-hidden">
-                                @if ($e->cover_image_path && $img($e->cover_image_path))
-                                    <img src="{{ $img($e->cover_image_path) }}" class="w-full h-full object-cover"
-                                        alt="">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">Event
-                                    </div>
-                                @endif
+                {{-- Slider --}}
+                <div class="md:col-span-7">
+                    <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
+                        @if ($first && $img($first->image_path))
+                            <img src="{{ $img($first->image_path) }}" class="w-full h-[350px] object-cover" alt="">
+                        @else
+                            <div class="h-[350px] flex items-center justify-center text-slate-500 bg-slate-50">
+                                No slider image
                             </div>
-                            <div class="p-3">
-                                <div class="text-sm font-semibold leading-5">{{ $e->title }}</div>
-                                <div class="text-xs text-slate-500 mt-1">
-                                    {{ \Carbon\Carbon::parse($e->event_date)->format('d F') }}
-                                    @if ($e->event_time)
-                                        • {{ \Carbon\Carbon::parse($e->event_time)->format('h:i A') }}
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Short statement --}}
+                <div class="md:col-span-3">
+                    <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
+                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">বাণী</div>
+
+                        <div class="p-3">
+                            @if ($statement)
+                                <div class="text-sm font-semibold text-slate-800">
+                                    {{ $statement->author_name ?? 'কর্তৃপক্ষ' }}
+                                </div>
+
+                                <div class="text-xs text-slate-500 mb-2">
+                                    {{ $statement->author_designation ?? '' }}
+                                </div>
+
+                                <div class="text-sm text-slate-700 leading-6">
+                                    {!! Str::limit(strip_tags($statement->body), 320, '...') !!}
+                                </div>
+                            @else
+                                <div class="text-sm text-slate-500">No statement set.</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Principal card --}}
+                <div class="md:col-span-2">
+                    <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
+                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">সম্মানিত প্রধান</div>
+
+                        <div class="p-3">
+                            @if ($statement && $statement->author_photo_path && $img($statement->author_photo_path))
+                                <img src="{{ $img($statement->author_photo_path) }}"
+                                    class="w-full h-[220px] object-cover border rounded" alt="">
+                            @else
+                                <div
+                                    class="w-full h-[220px] border rounded bg-slate-100 flex items-center justify-center text-slate-400">
+                                    No photo
+                                </div>
+                            @endif
+
+                            <div class="mt-3 text-sm font-semibold text-slate-800 leading-5">
+                                {{ $statement->author_name ?? 'অধ্যক্ষ / প্রধান শিক্ষক' }}
+                            </div>
+
+                            <div class="text-xs text-slate-600 mt-1">
+                                {{ $statement->author_designation ?? 'প্রতিষ্ঠান প্রধান' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- NOTICE BOARD --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white px-3 py-2 flex items-center justify-between">
+                    <div class="font-semibold">নোটিশ বোর্ড</div>
+                    <a href="{{ route('client.notices.index') }}"
+                        class="text-xs bg-white text-emerald-700 px-3 py-1 rounded hover:bg-slate-100">
+                        সকল নোটিশ দেখুন
+                    </a>
+                </div>
+
+                <div class="p-3">
+                    @if ($noticeCount > 0)
+                        <div class="space-y-3">
+                            @foreach ($notices->take(5) as $n)
+                                <div class="border-b border-slate-200 pb-3 last:border-b-0 last:pb-0">
+                                    <div class="flex items-start gap-3">
+                                        <div class="pt-1 text-green-600">●</div>
+
+                                        <div class="flex-1 min-w-0">
+                                            <a href="{{ route('client.notices.show', $n->slug) }}"
+                                                class="text-sm text-slate-800 hover:text-emerald-700 hover:underline line-clamp-2">
+                                                {{ $n->title }}
+                                            </a>
+
+                                            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                                <span>
+                                                    {{ $n->published_at?->format('d-m-Y') ?? $n->created_at->format('d-m-Y') }}
+                                                </span>
+
+                                                @if ($n->is_pinned)
+                                                    <span class="px-2 py-0.5 rounded bg-red-500 text-white">নতুন</span>
+                                                @endif
+
+                                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                    সাধারণ
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <a href="{{ route('client.notices.show', $n->slug) }}"
+                                                class="text-slate-400 hover:text-emerald-700">
+                                                ›
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-sm text-slate-500">No notices found.</div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- QUICK LINKS CARDS --}}
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <a href="{{ route('client.notices.index') }}"
+                    class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
+                    <div class="text-sm font-semibold text-slate-800">নোটিশ</div>
+                    <div class="text-xs text-slate-500 mt-1">সর্বশেষ সকল নোটিশ দেখুন</div>
+                </a>
+
+                <a href="{{ route('client.events.index') }}"
+                    class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
+                    <div class="text-sm font-semibold text-slate-800">ইভেন্ট</div>
+                    <div class="text-xs text-slate-500 mt-1">আসন্ন কার্যক্রম ও অনুষ্ঠান</div>
+                </a>
+
+                <a href="{{ route('client.achievements.index') }}"
+                    class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
+                    <div class="text-sm font-semibold text-slate-800">অর্জন</div>
+                    <div class="text-xs text-slate-500 mt-1">প্রতিষ্ঠানের সাফল্য ও স্বীকৃতি</div>
+                </a>
+
+                <a href="{{ route('client.videos.index') }}"
+                    class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
+                    <div class="text-sm font-semibold text-slate-800">ভিডিও গ্যালারী</div>
+                    <div class="text-xs text-slate-500 mt-1">ভিডিও ও মিডিয়া কনটেন্ট</div>
+                </a>
+            </div>
+
+            {{-- CONTENT BLOCKS --}}
+            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                {{-- Events --}}
+                <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                    <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
+                        <span>Upcoming Events</span>
+                        <a href="{{ route('client.events.index') }}" class="text-xs text-white/90 hover:text-white">
+                            সকল
+                        </a>
+                    </div>
+
+                    <div class="p-3 space-y-3">
+                        @forelse($events->take(3) as $e)
+                            <a href="{{ route('client.events.show', $e->slug) }}"
+                                class="block border rounded overflow-hidden hover:bg-slate-50">
+                                <div class="h-32 bg-slate-100">
+                                    @if ($e->cover_image_path && $img($e->cover_image_path))
+                                        <img src="{{ $img($e->cover_image_path) }}" class="w-full h-full object-cover"
+                                            alt="">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+                                            Event
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="p-3">
+                                    <div class="text-sm font-medium line-clamp-2">{{ $e->title }}</div>
+                                    <div class="text-xs text-slate-500 mt-1">
+                                        {{ \Carbon\Carbon::parse($e->event_date)->format('d F, Y') }}
+                                        @if ($e->event_time)
+                                            • {{ \Carbon\Carbon::parse($e->event_time)->format('h:i A') }}
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="text-sm text-slate-500">No upcoming events.</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Achievements --}}
+                <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                    <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
+                        <span>আমাদের অর্জন</span>
+                        <a href="{{ route('client.achievements.index') }}" class="text-xs text-white/90 hover:text-white">
+                            সকল
+                        </a>
+                    </div>
+
+                    <div class="p-3 space-y-3">
+                        @forelse($achievements->take(3) as $a)
+                            <div class="border rounded overflow-hidden">
+                                <div class="h-32 bg-slate-100">
+                                    @if ($a->image_path && $img($a->image_path))
+                                        <img class="w-full h-full object-cover" src="{{ $img($a->image_path) }}"
+                                            alt="">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+                                            No image
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="p-3 text-sm">
+                                    <div class="font-medium line-clamp-2">{{ $a->title }}</div>
+                                    @if ($a->year)
+                                        <div class="text-xs text-slate-500 mt-1">{{ $a->year }}</div>
                                     @endif
                                 </div>
                             </div>
+                        @empty
+                            <div class="text-sm text-slate-500">No achievements.</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Videos --}}
+                <div
+                    class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden md:col-span-2 xl:col-span-1">
+                    <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
+                        <span>ভিডিও গ্যালারী</span>
+                        <a href="{{ route('client.videos.index') }}" class="text-xs text-white/90 hover:text-white">
+                            সকল
                         </a>
-                    @empty
-                        <div class="text-sm text-slate-500 col-span-2 text-center">No upcoming events.</div>
-                    @endforelse
-                </div>
-            </div>
+                    </div>
 
-            {{-- Achievements --}}
-            <div class="bg-white border rounded shadow p-4">
-                <div class="font-semibold text-center mb-3">আমাদের অর্জন</div>
+                    <div class="p-3 space-y-3">
+                        @forelse($videos->take(3) as $v)
+                            @php
+                                $id = $ytId($v->youtube_url);
+                                $thumb = $v->thumbnail_path
+                                    ? $img($v->thumbnail_path)
+                                    : ($id
+                                        ? "https://img.youtube.com/vi/{$id}/hqdefault.jpg"
+                                        : null);
+                            @endphp
 
-                <div class="grid sm:grid-cols-3 gap-3">
-                    @forelse($achievements as $a)
-                        <div class="border rounded overflow-hidden bg-white">
-                            <div class="h-28 bg-slate-100">
-                                @if ($a->image_path && $img($a->image_path))
-                                    <img class="w-full h-full object-cover" src="{{ $img($a->image_path) }}"
-                                        alt="">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">No
-                                        image</div>
-                                @endif
-                            </div>
-                            <div class="p-2 text-xs text-slate-700 leading-5">
-                                <div class="font-semibold">{{ $a->title }}</div>
-                                @if ($a->year)
-                                    <div class="text-slate-500">{{ $a->year }}</div>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-sm text-slate-500 col-span-3 text-center">No achievements.</div>
-                    @endforelse
-                </div>
+                            <a href="{{ route('client.videos.index') }}"
+                                class="block border rounded overflow-hidden hover:bg-slate-50 transition">
+                                <div class="aspect-video bg-slate-200 relative overflow-hidden">
+                                    @if ($thumb)
+                                        <img src="{{ $thumb }}" class="w-full h-full object-cover"
+                                            alt="">
+                                    @endif
 
-                <div class="mt-4 flex justify-center">
-                    <a href="{{ route('client.achievements.index') }}"
-                        class="px-6 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">
-                        সব অর্জন দেখুন
-                    </a>
-                </div>
-            </div>
-
-            {{-- Videos --}}
-            <div class="bg-white border rounded shadow p-4">
-                <div class="font-semibold text-center mb-3">ভিডিও গ্যালারী</div>
-
-                <div class="grid sm:grid-cols-3 gap-3">
-                    @forelse($videos as $v)
-                        @php
-                            $id = $ytId($v->youtube_url);
-                            $thumb = $v->thumbnail_path
-                                ? $img($v->thumbnail_path)
-                                : ($id
-                                    ? "https://img.youtube.com/vi/{$id}/hqdefault.jpg"
-                                    : null);
-                        @endphp
-
-                        <a href="{{ route('client.videos.index') }}"
-                            class="border rounded overflow-hidden hover:bg-slate-50 transition">
-                            <div class="aspect-video bg-slate-200 relative overflow-hidden">
-                                @if ($thumb)
-                                    <img src="{{ $thumb }}" class="w-full h-full object-cover" alt="">
-                                @endif
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="w-14 h-10 rounded bg-red-600/90 flex items-center justify-center shadow">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white"
-                                            viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M8 5v14l11-7z" />
-                                        </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div
+                                            class="w-14 h-10 rounded bg-red-600/90 flex items-center justify-center shadow">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white"
+                                                viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="p-2 text-sm font-medium line-clamp-2">{{ $v->title }}</div>
-                        </a>
-                    @empty
-                        <div class="text-sm text-slate-500 col-span-3 text-center">No videos.</div>
-                    @endforelse
+
+                                <div class="p-2 text-sm font-medium line-clamp-2">{{ $v->title }}</div>
+                            </a>
+                        @empty
+                            <div class="text-sm text-slate-500">No videos.</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
@@ -209,33 +334,63 @@
         {{-- RIGHT SIDEBAR --}}
         <div class="lg:col-span-3 space-y-4">
 
-            {{-- Statement --}}
-            <div class="bg-white border rounded shadow p-3">
-                <div class="text-sm font-semibold mb-2">অধ্যক্ষের বাণী</div>
+            {{-- Important links --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">গুরুত্বপূর্ণ লিংক</div>
 
-                @if ($statement)
-                    @if ($statement->author_photo_path && $img($statement->author_photo_path))
-                        <img src="{{ $img($statement->author_photo_path) }}" class="w-full rounded border mb-2"
-                            alt="">
+                <div class="divide-y">
+                    @if (count($quickLinks))
+                        @foreach ($quickLinks as $l)
+                            <a href="{{ $l['url'] ?? '#' }}" target="_blank"
+                                class="flex items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700">
+                                <span>{{ $l['title'] ?? ($l['label'] ?? 'Link') }}</span>
+                                <span>›</span>
+                            </a>
+                        @endforeach
+                    @else
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50">
+                            <span>প্রধানমন্ত্রীর কার্যালয়</span><span>›</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50">
+                            <span>শিক্ষা মন্ত্রণালয়</span><span>›</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50">
+                            <span>All cadre PMIS</span><span>›</span>
+                        </a>
                     @endif
+                </div>
 
-                    <div class="text-xs text-slate-700 leading-5">
-                        {!! Str::limit(strip_tags($statement->body), 600, '...') !!}
-                    </div>
-
-                    <div class="mt-3 text-xs text-slate-600">
-                        <div class="font-semibold">{{ $statement->author_name ?? '' }}</div>
-                        <div>{{ $statement->author_designation ?? '' }}</div>
-                    </div>
-                @else
-                    <div class="text-sm text-slate-500">No statement set.</div>
-                @endif
+                <div class="p-3">
+                    <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">সকল</a>
+                </div>
             </div>
 
-            {{-- Helplines --}}
-            <div class="bg-white border rounded shadow p-3">
-                <div class="text-sm font-semibold mb-2">সরকারি হেল্পলাইন</div>
-                <div class="space-y-2">
+            {{-- More portals --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">অভ্যন্তরীণ লিংকসমূহ</div>
+
+                <div class="divide-y text-sm">
+                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
+                        <span>https://www.emis.gov.bd</span><span>›</span>
+                    </a>
+                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
+                        <span>MPO EFT Link</span><span>›</span>
+                    </a>
+                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
+                        <span>বদলির আবেদন (সরকারি কলেজ)</span><span>›</span>
+                    </a>
+                </div>
+
+                <div class="p-3">
+                    <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">সকল</a>
+                </div>
+            </div>
+
+            {{-- Helpline --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">সরকারি হেল্পলাইন</div>
+
+                <div class="p-3 space-y-2">
                     <div class="border rounded p-2 flex items-center justify-between text-sm">
                         <span>জাতীয় সেবা</span><span class="font-bold text-emerald-700">333</span>
                     </div>
@@ -251,31 +406,25 @@
                 </div>
             </div>
 
-            {{-- Important links --}}
-            <div class="bg-white border rounded shadow p-3">
-                <div class="text-sm font-semibold mb-2">গুরুত্বপূর্ণ লিংক</div>
+            {{-- Facebook placeholder --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">জাতীয় ফেসবুক পেজ</div>
 
-                @php $links = $importantLinks ?? []; @endphp
-
-                @if (count($links))
-                    <div class="space-y-2 text-sm">
-                        @foreach ($links as $l)
-                            <a class="block hover:underline" href="{{ $l['url'] ?? '#' }}" target="_blank">
-                                {{ $l['title'] ?? ($l['label'] ?? 'Link') }}
-                            </a>
-                        @endforeach
+                <div class="p-3">
+                    <div class="border rounded bg-[#f5f8ff] p-4 text-center">
+                        <div class="text-3xl mb-2">📘</div>
+                        <div class="font-semibold text-slate-700">Follow us on Facebook</div>
                     </div>
-                @else
-                    <div class="space-y-2 text-sm">
-                        <a class="block hover:underline" href="#" target="_blank">শিক্ষা বোর্ড</a>
-                        <a class="block hover:underline" href="#" target="_blank">EMIS</a>
-                        <a class="block hover:underline" href="#" target="_blank">মন্ত্রণালয়</a>
-                        <a class="block hover:underline" href="#" target="_blank">ফলাফল</a>
-                        <a class="block hover:underline" href="#" target="_blank">শিক্ষক বাতায়ন</a>
-                    </div>
-                @endif
+                </div>
             </div>
 
+            {{-- Visitor block --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">ভিজিটর কাউন্টার</div>
+                <div class="p-3 text-sm text-slate-600">
+                    <div class="border rounded p-3 text-center">ভিজিটর ইনফরমেশন মডিউল</div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
