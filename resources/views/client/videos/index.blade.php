@@ -2,6 +2,18 @@
 @section('title', 'Videos')
 
 @section('content')
+    @php
+        $img = function ($path) {
+            if (!$path) {
+                return null;
+            }
+            if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+                return $path;
+            }
+            return asset('storage/' . ltrim($path, '/'));
+        };
+    @endphp
+
     <div class="bg-white border rounded shadow p-4">
         <div class="flex items-center justify-between mb-4">
             <div class="font-semibold text-lg">ভিডিও গ্যালারী</div>
@@ -11,17 +23,9 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse($videos as $v)
                 @php
-                    $u = $v->youtube_url;
-                    $vid = null;
-                    if (str_contains($u, 'embed/')) {
-                        $vid = \Illuminate\Support\Str::after($u, 'embed/');
-                    } elseif (str_contains($u, 'youtu.be/')) {
-                        $vid = \Illuminate\Support\Str::after($u, 'youtu.be/');
-                    } elseif (str_contains($u, 'v=')) {
-                        $vid = \Illuminate\Support\Str::after($u, 'v=');
-                    }
-                    $vid = $vid ? strtok($vid, '&?') : null;
-                    $embed = $vid ? "https://www.youtube.com/embed/{$vid}" : $u;
+                    $vid = $v->youtubeId();
+                    $thumb = $v->thumbnail_path ? $img($v->thumbnail_path) : $v->youtubeThumbUrl();
+                    $embed = $vid ? "https://www.youtube.com/embed/{$vid}" : $v->youtube_url;
                 @endphp
 
                 <div class="border rounded overflow-hidden">

@@ -2,6 +2,18 @@
 @section('title', 'Events')
 
 @section('content')
+    @php
+        $img = function ($path) {
+            if (!$path) {
+                return null;
+            }
+            if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+                return $path;
+            }
+            return asset('storage/' . ltrim($path, '/'));
+        };
+    @endphp
+
     <div class="bg-white border rounded shadow p-4">
         <div class="flex items-center justify-between mb-4">
             <div class="font-semibold text-lg">Events</div>
@@ -19,8 +31,8 @@
             @forelse($events as $e)
                 <a href="{{ route('client.events.show', $e->slug) }}"
                     class="border rounded overflow-hidden hover:bg-slate-50">
-                    @if ($e->cover_image_path)
-                        <img src="{{ $e->cover_image_path }}" class="w-full h-40 object-cover" alt="">
+                    @if ($e->cover_image_path && $img($e->cover_image_path))
+                        <img src="{{ $img($e->cover_image_path) }}" class="w-full h-40 object-cover" alt="">
                     @else
                         <div class="h-40 bg-slate-100 flex items-center justify-center text-slate-500">No Image</div>
                     @endif

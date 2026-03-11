@@ -9,13 +9,16 @@
             if (!$path) {
                 return null;
             }
+
             if (Str::startsWith($path, ['http://', 'https://'])) {
                 return $path;
             }
+
             if (Str::startsWith($path, 'storage/')) {
                 return asset($path);
             }
-            return asset('storage/' . $path);
+
+            return asset('storage/' . ltrim($path, '/'));
         };
 
         $ytId = function ($url) {
@@ -36,37 +39,38 @@
             return $id ? strtok($id, '&?') : null;
         };
 
-        $first = $sliders?->first();
-        $quickLinks = $importantLinks ?? [];
-
-        $noticeCount = $notices?->count() ?? 0;
-        $eventCount = $events?->count() ?? 0;
-        $achievementCount = $achievements?->count() ?? 0;
-        $videoCount = $videos?->count() ?? 0;
+        $sliderItems = $sliders ?? collect();
+        $first = $sliderItems->first();
+        $quickLinks = $importantLinks ?? collect();
+        $internalItems = $internalLinks ?? collect();
     @endphp
 
     <div class="grid lg:grid-cols-12 gap-4">
 
-        {{-- LEFT CONTENT --}}
+        {{-- LEFT --}}
         <div class="lg:col-span-9 space-y-4">
 
-            {{-- TOP AREA --}}
+            {{-- Top 3 blocks --}}
             <div class="grid md:grid-cols-12 gap-4">
-
-                {{-- Slider --}}
                 <div class="md:col-span-7">
-                    <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
+                    <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                         @if ($first && $img($first->image_path))
-                            <img src="{{ $img($first->image_path) }}" class="w-full h-[350px] object-cover" alt="">
+                            <div class="relative">
+                                <img src="{{ $img($first->image_path) }}" class="w-full h-[340px] object-cover" alt="">
+                                @if ($sliderItems->count() > 1)
+                                    <div class="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-3 py-1 rounded">
+                                        {{ $sliderItems->count() }} slides
+                                    </div>
+                                @endif
+                            </div>
                         @else
-                            <div class="h-[350px] flex items-center justify-center text-slate-500 bg-slate-50">
+                            <div class="h-[340px] flex items-center justify-center text-slate-500 bg-slate-50">
                                 No slider image
                             </div>
                         @endif
                     </div>
                 </div>
 
-                {{-- Short statement --}}
                 <div class="md:col-span-3">
                     <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
                         <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">বাণী</div>
@@ -91,7 +95,6 @@
                     </div>
                 </div>
 
-                {{-- Principal card --}}
                 <div class="md:col-span-2">
                     <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
                         <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">সম্মানিত প্রধান</div>
@@ -119,7 +122,7 @@
                 </div>
             </div>
 
-            {{-- NOTICE BOARD --}}
+            {{-- Notice --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white px-3 py-2 flex items-center justify-between">
                     <div class="font-semibold">নোটিশ বোর্ড</div>
@@ -130,51 +133,41 @@
                 </div>
 
                 <div class="p-3">
-                    @if ($noticeCount > 0)
-                        <div class="space-y-3">
-                            @foreach ($notices->take(5) as $n)
-                                <div class="border-b border-slate-200 pb-3 last:border-b-0 last:pb-0">
-                                    <div class="flex items-start gap-3">
-                                        <div class="pt-1 text-green-600">●</div>
+                    @forelse($notices->take(5) as $n)
+                        <div class="border-b border-slate-200 pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0">
+                            <div class="flex items-start gap-3">
+                                <div class="pt-1 text-green-600">●</div>
 
-                                        <div class="flex-1 min-w-0">
-                                            <a href="{{ route('client.notices.show', $n->slug) }}"
-                                                class="text-sm text-slate-800 hover:text-emerald-700 hover:underline line-clamp-2">
-                                                {{ $n->title }}
-                                            </a>
+                                <div class="flex-1 min-w-0">
+                                    <a href="{{ route('client.notices.show', $n->slug) }}"
+                                        class="text-sm text-slate-800 hover:text-emerald-700 hover:underline line-clamp-2">
+                                        {{ $n->title }}
+                                    </a>
 
-                                            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                                                <span>
-                                                    {{ $n->published_at?->format('d-m-Y') ?? $n->created_at->format('d-m-Y') }}
-                                                </span>
+                                    <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                                        <span>{{ $n->published_at?->format('d-m-Y') ?? $n->created_at->format('d-m-Y') }}</span>
 
-                                                @if ($n->is_pinned)
-                                                    <span class="px-2 py-0.5 rounded bg-red-500 text-white">নতুন</span>
-                                                @endif
+                                        @if ($n->is_pinned)
+                                            <span class="px-2 py-0.5 rounded bg-red-500 text-white">নতুন</span>
+                                        @endif
 
-                                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                                                    সাধারণ
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <a href="{{ route('client.notices.show', $n->slug) }}"
-                                                class="text-slate-400 hover:text-emerald-700">
-                                                ›
-                                            </a>
-                                        </div>
+                                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600">সাধারণ</span>
                                     </div>
                                 </div>
-                            @endforeach
+
+                                <a href="{{ route('client.notices.show', $n->slug) }}"
+                                    class="text-slate-400 hover:text-emerald-700">
+                                    ›
+                                </a>
+                            </div>
                         </div>
-                    @else
+                    @empty
                         <div class="text-sm text-slate-500">No notices found.</div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
 
-            {{-- QUICK LINKS CARDS --}}
+            {{-- Quick cards --}}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <a href="{{ route('client.notices.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
@@ -194,23 +187,21 @@
                     <div class="text-xs text-slate-500 mt-1">প্রতিষ্ঠানের সাফল্য ও স্বীকৃতি</div>
                 </a>
 
-                <a href="{{ route('client.videos.index') }}"
+                <a href="{{ route('client.gallery.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
-                    <div class="text-sm font-semibold text-slate-800">ভিডিও গ্যালারী</div>
-                    <div class="text-xs text-slate-500 mt-1">ভিডিও ও মিডিয়া কনটেন্ট</div>
+                    <div class="text-sm font-semibold text-slate-800">ফটো গ্যালারী</div>
+                    <div class="text-xs text-slate-500 mt-1">অ্যালবাম ও ছবি দেখুন</div>
                 </a>
             </div>
 
-            {{-- CONTENT BLOCKS --}}
+            {{-- Main content rows --}}
             <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
 
                 {{-- Events --}}
                 <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
                         <span>Upcoming Events</span>
-                        <a href="{{ route('client.events.index') }}" class="text-xs text-white/90 hover:text-white">
-                            সকল
-                        </a>
+                        <a href="{{ route('client.events.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -227,7 +218,6 @@
                                         </div>
                                     @endif
                                 </div>
-
                                 <div class="p-3">
                                     <div class="text-sm font-medium line-clamp-2">{{ $e->title }}</div>
                                     <div class="text-xs text-slate-500 mt-1">
@@ -248,9 +238,8 @@
                 <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
                         <span>আমাদের অর্জন</span>
-                        <a href="{{ route('client.achievements.index') }}" class="text-xs text-white/90 hover:text-white">
-                            সকল
-                        </a>
+                        <a href="{{ route('client.achievements.index') }}"
+                            class="text-xs text-white/90 hover:text-white">সকল</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -258,7 +247,7 @@
                             <div class="border rounded overflow-hidden">
                                 <div class="h-32 bg-slate-100">
                                     @if ($a->image_path && $img($a->image_path))
-                                        <img class="w-full h-full object-cover" src="{{ $img($a->image_path) }}"
+                                        <img src="{{ $img($a->image_path) }}" class="w-full h-full object-cover"
                                             alt="">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">
@@ -266,7 +255,6 @@
                                         </div>
                                     @endif
                                 </div>
-
                                 <div class="p-3 text-sm">
                                     <div class="font-medium line-clamp-2">{{ $a->title }}</div>
                                     @if ($a->year)
@@ -285,9 +273,7 @@
                     class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden md:col-span-2 xl:col-span-1">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
                         <span>ভিডিও গ্যালারী</span>
-                        <a href="{{ route('client.videos.index') }}" class="text-xs text-white/90 hover:text-white">
-                            সকল
-                        </a>
+                        <a href="{{ route('client.videos.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -319,7 +305,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="p-2 text-sm font-medium line-clamp-2">{{ $v->title }}</div>
                             </a>
                         @empty
@@ -329,9 +314,30 @@
                 </div>
             </div>
 
+            {{-- Albums row --}}
+            <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
+                    <span>ফটো গ্যালারী</span>
+                    <a href="{{ route('client.gallery.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
+                </div>
+
+                <div class="p-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @forelse($albums->take(6) as $album)
+                        <a href="{{ route('client.gallery.album', $album->id) }}"
+                            class="border rounded p-4 hover:bg-slate-50">
+                            <div class="text-sm font-semibold text-slate-800 line-clamp-2">{{ $album->title }}</div>
+                            <div class="text-xs text-slate-500 mt-2">অ্যালবাম দেখুন</div>
+                        </a>
+                    @empty
+                        <div class="sm:col-span-2 lg:col-span-3 text-sm text-slate-500">
+                            No gallery album found.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
-        {{-- RIGHT SIDEBAR --}}
+        {{-- RIGHT --}}
         <div class="lg:col-span-3 space-y-4">
 
             {{-- Important links --}}
@@ -341,9 +347,9 @@
                 <div class="divide-y">
                     @if (count($quickLinks))
                         @foreach ($quickLinks as $l)
-                            <a href="{{ $l['url'] ?? '#' }}" target="_blank"
+                            <a href="{{ $l['url'] ?? '#' }}" target="_blank" rel="noopener"
                                 class="flex items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700">
-                                <span>{{ $l['title'] ?? ($l['label'] ?? 'Link') }}</span>
+                                <span>{{ $l['title'] ?? 'Link' }}</span>
                                 <span>›</span>
                             </a>
                         @endforeach
@@ -361,24 +367,24 @@
                 </div>
 
                 <div class="p-3">
-                    <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">সকল</a>
+                    <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">
+                        সকল
+                    </a>
                 </div>
             </div>
 
-            {{-- More portals --}}
+            {{-- Internal links --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">অভ্যন্তরীণ লিংকসমূহ</div>
 
                 <div class="divide-y text-sm">
-                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
-                        <span>https://www.emis.gov.bd</span><span>›</span>
-                    </a>
-                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
-                        <span>MPO EFT Link</span><span>›</span>
-                    </a>
-                    <a href="#" class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
-                        <span>বদলির আবেদন (সরকারি কলেজ)</span><span>›</span>
-                    </a>
+                    @foreach ($internalItems as $item)
+                        <a href="{{ $item['url'] ?? '#' }}" target="_blank" rel="noopener"
+                            class="flex items-center justify-between px-3 py-2 hover:bg-slate-50">
+                            <span>{{ $item['title'] ?? 'Link' }}</span>
+                            <span>›</span>
+                        </a>
+                    @endforeach
                 </div>
 
                 <div class="p-3">
@@ -406,19 +412,19 @@
                 </div>
             </div>
 
-            {{-- Facebook placeholder --}}
+            {{-- Facebook --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">জাতীয় ফেসবুক পেজ</div>
 
                 <div class="p-3">
-                    <div class="border rounded bg-[#f5f8ff] p-4 text-center">
+                    <div class="border rounded bg-[#f5f8ff] p-6 text-center">
                         <div class="text-3xl mb-2">📘</div>
                         <div class="font-semibold text-slate-700">Follow us on Facebook</div>
                     </div>
                 </div>
             </div>
 
-            {{-- Visitor block --}}
+            {{-- Visitor --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">ভিজিটর কাউন্টার</div>
                 <div class="p-3 text-sm text-slate-600">
