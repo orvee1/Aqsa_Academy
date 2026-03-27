@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="bn">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="utf-8">
@@ -40,9 +40,9 @@
         <div class="bg-[#0b8f3a] text-white text-xs">
             <div class="px-3 py-2 flex flex-wrap items-center justify-between gap-2">
                 <div class="flex flex-wrap items-center gap-4">
-                    <span>জাতীয় তথ্য বাতায়ন</span>
-                    <span>স্কুল কোড: <strong>{{ $institute?->school_code ?? '—' }}</strong></span>
-                    <span>EIIN: <strong>{{ $institute?->eiin ?? '—' }}</strong></span>
+                    <span>{{ __('home.national_portal') }}</span>
+                    <span>{{ __('home.school_code') }}: <strong>{{ $institute?->school_code ?? '—' }}</strong></span>
+                    <span>{{ __('home.eiin') }}: <strong>{{ $institute?->eiin ?? '—' }}</strong></span>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -58,11 +58,14 @@
                     @if ($applyUrl)
                         <a href="{{ $applyUrl }}" target="_blank" rel="noopener"
                             class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium">
-                            আবেদন
+                            {{ __('home.apply') }}
                         </a>
                     @endif
 
-                    <a href="#" class="hover:underline">English</a>
+                    <a href="{{ route('locale.switch', app()->getLocale() === 'bn' ? 'en' : 'bn') }}"
+                        class="hover:underline">
+                        {{ app()->getLocale() === 'bn' ? __('home.english') : __('home.bangla') }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,10 +94,10 @@
 
                         <div class="text-white">
                             <div class="text-2xl md:text-5xl font-bold leading-tight">
-                                {{ $institute?->name ?? 'প্রতিষ্ঠানের নাম' }}
+                                {{ $institute?->name ?? 'Institution Name' }}
                             </div>
                             <div class="mt-1 text-sm md:text-xl text-white/90">
-                                {{ $institute?->slogan ?? 'শিক্ষা, শৃঙ্খলা, উন্নয়ন' }}
+                                {{ $institute?->slogan ?? 'Education, Discipline, Development' }}
                             </div>
                         </div>
                     </div>
@@ -118,7 +121,7 @@
                             <a href="{{ route('client.home') }}"
                                 class="inline-flex items-center gap-2 px-3 py-2 rounded hover:bg-white/10">
                                 <span>🏠</span>
-                                <span>হোম</span>
+                                <span>{{ __('home.home') }}</span>
                             </a>
                         </li>
 
@@ -135,7 +138,7 @@
             <div class="border-x border-b border-slate-300 bg-white">
                 <div class="px-3 py-2 flex items-center gap-3">
                     <span class="bg-red-500 text-white text-xs px-3 py-1 rounded font-semibold whitespace-nowrap">
-                        জরুরি নোটিশ
+                        {{ __('home.urgent_notice') }}
                     </span>
 
                     <div class="flex-1 overflow-hidden">
@@ -159,46 +162,42 @@
 
         @php
             use Illuminate\Support\Str;
-
             $fs = $footer ?? null;
             $address = $fs?->address ?? ($institute?->address ?? null);
             $map = $fs?->map_embed ?? null;
             $about = $fs?->about ?? null;
         @endphp
 
+        {{-- Footer --}}
         <footer class="bg-[#ececec] border-x border-b border-slate-300 mt-6">
             <div class="border-t-[5px] border-[#7b7b7b]"></div>
 
             <div class="px-4 md:px-5 py-6 md:py-7">
                 <div class="grid md:grid-cols-12 gap-6 items-start">
 
-                    {{-- Left --}}
                     <div class="md:col-span-3">
-                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">সাইট সম্পর্কিত</h3>
+                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">{{ __('home.site_related') }}</h3>
 
                         <ul class="space-y-2 text-sm text-slate-700">
-                            <li>
-                                <a href="#" class="hover:text-emerald-700 hover:underline">যোগাযোগ</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-emerald-700 hover:underline">ফিডব্যাক</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:text-emerald-700 hover:underline">লোকেশন ম্যাপ</a>
+                            <li><a href="#"
+                                    class="hover:text-emerald-700 hover:underline">{{ __('home.contact') }}</a></li>
+                            <li><a href="#"
+                                    class="hover:text-emerald-700 hover:underline">{{ __('home.feedback') }}</a></li>
+                            <li><a href="#"
+                                    class="hover:text-emerald-700 hover:underline">{{ __('home.location_map') }}</a>
                             </li>
                         </ul>
                     </div>
 
-                    {{-- Middle --}}
                     <div class="md:col-span-4">
-                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">যোগাযোগ</h3>
+                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">{{ __('home.contact') }}</h3>
 
                         <div class="text-sm text-slate-700 leading-6">
                             <div>{!! nl2br(e($address ?? '—')) !!}</div>
 
                             <div class="mt-2">
-                                <div>ফোন: {{ $fs?->phone ?? ($institute?->phone_1 ?? '—') }}</div>
-                                <div>ইমেইল: {{ $fs?->email ?? '—' }}</div>
+                                <div>{{ __('home.phone') }}: {{ $fs?->phone ?? ($institute?->phone_1 ?? '—') }}</div>
+                                <div>{{ __('home.email') }}: {{ $fs?->email ?? '—' }}</div>
                             </div>
                         </div>
 
@@ -209,9 +208,8 @@
                         @endif
                     </div>
 
-                    {{-- Right --}}
                     <div class="md:col-span-5">
-                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">ম্যাপ</h3>
+                        <h3 class="text-[15px] font-bold text-slate-900 mb-3">{{ __('home.map') }}</h3>
 
                         <div class="bg-white border border-slate-300 rounded-sm overflow-hidden">
                             @if ($map)
@@ -219,7 +217,7 @@
                             @else
                                 <div
                                     class="h-[180px] flex items-center justify-center text-sm text-slate-500 bg-slate-50">
-                                    Map not set
+                                    {{ __('home.map_not_set') }}
                                 </div>
                             @endif
                         </div>
@@ -235,7 +233,7 @@
                     </div>
 
                     <div class="font-medium">
-                        Powered by {{ config('app.name') }}
+                        {{ __('home.powered_by') }} {{ config('app.name') }}
                     </div>
                 </div>
             </div>

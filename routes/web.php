@@ -78,7 +78,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::patch('institutes/{institute}/toggle', [InstituteController::class, 'toggle'])->name('institutes.toggle');
 
     // Notice Routes
-    Route::resource('notices', NoticeController::class)->except(['show','create']);
+    Route::resource('notices', NoticeController::class)->except(['show', 'create']);
 
     Route::patch('notices/{notice}/toggle-hide', [NoticeController::class, 'toggleHide'])->name('notices.toggle-hide');
     Route::patch('notices/{notice}/toggle-publish', [NoticeController::class, 'togglePublish'])->name('notices.toggle-publish');
@@ -189,3 +189,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
+
+Route::get('/locale/{locale}', function ($locale) {
+    abort_unless(in_array($locale, ['bn', 'en']), 404);
+
+    session(['locale' => $locale]);
+    app()->setLocale($locale);
+
+    return redirect()->back();
+})->name('locale.switch');

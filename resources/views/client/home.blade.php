@@ -50,7 +50,6 @@
         {{-- LEFT --}}
         <div class="lg:col-span-9 space-y-4">
 
-            {{-- Top 3 blocks --}}
             <div class="grid md:grid-cols-12 gap-4">
                 <div class="md:col-span-7">
                     <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
@@ -65,7 +64,7 @@
                             </div>
                         @else
                             <div class="h-[340px] flex items-center justify-center text-slate-500 bg-slate-50">
-                                No slider image
+                                {{ __('home.no_slider') }}
                             </div>
                         @endif
                     </div>
@@ -73,12 +72,12 @@
 
                 <div class="md:col-span-3">
                     <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
-                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">বাণী</div>
+                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">{{ __('home.message') }}</div>
 
                         <div class="p-3">
                             @if ($statement)
                                 <div class="text-sm font-semibold text-slate-800">
-                                    {{ $statement->author_name ?? 'কর্তৃপক্ষ' }}
+                                    {{ $statement->author_name ?? __('home.authority_default') }}
                                 </div>
 
                                 <div class="text-xs text-slate-500 mb-2">
@@ -89,7 +88,7 @@
                                     {!! Str::limit(strip_tags($statement->body), 320, '...') !!}
                                 </div>
                             @else
-                                <div class="text-sm text-slate-500">No statement set.</div>
+                                <div class="text-sm text-slate-500">{{ __('home.no_notices') }}</div>
                             @endif
                         </div>
                     </div>
@@ -97,7 +96,8 @@
 
                 <div class="md:col-span-2">
                     <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden h-full">
-                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">সম্মানিত প্রধান</div>
+                        <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">
+                            {{ __('home.honourable_head') }}</div>
 
                         <div class="p-3">
                             @if ($statement && $statement->author_photo_path && $img($statement->author_photo_path))
@@ -106,16 +106,16 @@
                             @else
                                 <div
                                     class="w-full h-[220px] border rounded bg-slate-100 flex items-center justify-center text-slate-400">
-                                    No photo
+                                    {{ __('home.no_photo') }}
                                 </div>
                             @endif
 
                             <div class="mt-3 text-sm font-semibold text-slate-800 leading-5">
-                                {{ $statement->author_name ?? 'অধ্যক্ষ / প্রধান শিক্ষক' }}
+                                {{ $statement->author_name ?? __('home.principal_default') }}
                             </div>
 
                             <div class="text-xs text-slate-600 mt-1">
-                                {{ $statement->author_designation ?? 'প্রতিষ্ঠান প্রধান' }}
+                                {{ $statement->author_designation ?? __('home.principal_designation_default') }}
                             </div>
                         </div>
                     </div>
@@ -125,10 +125,10 @@
             {{-- Notice --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white px-3 py-2 flex items-center justify-between">
-                    <div class="font-semibold">নোটিশ বোর্ড</div>
+                    <div class="font-semibold">{{ __('home.notice_board') }}</div>
                     <a href="{{ route('client.notices.index') }}"
                         class="text-xs bg-white text-emerald-700 px-3 py-1 rounded hover:bg-slate-100">
-                        সকল নোটিশ দেখুন
+                        {{ __('home.all_notices') }}
                     </a>
                 </div>
 
@@ -148,10 +148,12 @@
                                         <span>{{ $n->published_at?->format('d-m-Y') ?? $n->created_at->format('d-m-Y') }}</span>
 
                                         @if ($n->is_pinned)
-                                            <span class="px-2 py-0.5 rounded bg-red-500 text-white">নতুন</span>
+                                            <span
+                                                class="px-2 py-0.5 rounded bg-red-500 text-white">{{ __('home.new') }}</span>
                                         @endif
 
-                                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600">সাধারণ</span>
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-100 text-slate-600">{{ __('home.general') }}</span>
                                     </div>
                                 </div>
 
@@ -162,7 +164,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-sm text-slate-500">No notices found.</div>
+                        <div class="text-sm text-slate-500">{{ __('home.no_notices') }}</div>
                     @endforelse
                 </div>
             </div>
@@ -171,26 +173,26 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <a href="{{ route('client.notices.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
-                    <div class="text-sm font-semibold text-slate-800">নোটিশ</div>
-                    <div class="text-xs text-slate-500 mt-1">সর্বশেষ সকল নোটিশ দেখুন</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ __('home.latest_notices') }}</div>
+                    <div class="text-xs text-slate-500 mt-1">{{ __('home.latest_notices_desc') }}</div>
                 </a>
 
                 <a href="{{ route('client.events.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
-                    <div class="text-sm font-semibold text-slate-800">ইভেন্ট</div>
-                    <div class="text-xs text-slate-500 mt-1">আসন্ন কার্যক্রম ও অনুষ্ঠান</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ __('home.events') }}</div>
+                    <div class="text-xs text-slate-500 mt-1">{{ __('home.events_desc') }}</div>
                 </a>
 
                 <a href="{{ route('client.achievements.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
-                    <div class="text-sm font-semibold text-slate-800">অর্জন</div>
-                    <div class="text-xs text-slate-500 mt-1">প্রতিষ্ঠানের সাফল্য ও স্বীকৃতি</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ __('home.achievements') }}</div>
+                    <div class="text-xs text-slate-500 mt-1">{{ __('home.achievements_desc') }}</div>
                 </a>
 
                 <a href="{{ route('client.gallery.index') }}"
                     class="bg-white border border-slate-300 rounded-sm shadow-sm p-4 hover:bg-slate-50 transition">
-                    <div class="text-sm font-semibold text-slate-800">ফটো গ্যালারী</div>
-                    <div class="text-xs text-slate-500 mt-1">অ্যালবাম ও ছবি দেখুন</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ __('home.photo_gallery') }}</div>
+                    <div class="text-xs text-slate-500 mt-1">{{ __('home.photo_gallery_desc') }}</div>
                 </a>
             </div>
 
@@ -200,8 +202,9 @@
                 {{-- Events --}}
                 <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
-                        <span>Upcoming Events</span>
-                        <a href="{{ route('client.events.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
+                        <span>{{ __('home.upcoming_events') }}</span>
+                        <a href="{{ route('client.events.index') }}"
+                            class="text-xs text-white/90 hover:text-white">{{ __('home.all') }}</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -229,7 +232,7 @@
                                 </div>
                             </a>
                         @empty
-                            <div class="text-sm text-slate-500">No upcoming events.</div>
+                            <div class="text-sm text-slate-500">{{ __('home.no_events') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -237,9 +240,9 @@
                 {{-- Achievements --}}
                 <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
-                        <span>আমাদের অর্জন</span>
+                        <span>{{ __('home.achievements') }}</span>
                         <a href="{{ route('client.achievements.index') }}"
-                            class="text-xs text-white/90 hover:text-white">সকল</a>
+                            class="text-xs text-white/90 hover:text-white">{{ __('home.all') }}</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -251,7 +254,7 @@
                                             alt="">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                                            No image
+                                            {{ __('home.no_photo') }}
                                         </div>
                                     @endif
                                 </div>
@@ -263,7 +266,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-sm text-slate-500">No achievements.</div>
+                            <div class="text-sm text-slate-500">{{ __('home.no_achievements') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -272,8 +275,9 @@
                 <div
                     class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden md:col-span-2 xl:col-span-1">
                     <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
-                        <span>ভিডিও গ্যালারী</span>
-                        <a href="{{ route('client.videos.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
+                        <span>{{ __('home.video_gallery') }}</span>
+                        <a href="{{ route('client.videos.index') }}"
+                            class="text-xs text-white/90 hover:text-white">{{ __('home.all') }}</a>
                     </div>
 
                     <div class="p-3 space-y-3">
@@ -308,7 +312,7 @@
                                 <div class="p-2 text-sm font-medium line-clamp-2">{{ $v->title }}</div>
                             </a>
                         @empty
-                            <div class="text-sm text-slate-500">No videos.</div>
+                            <div class="text-sm text-slate-500">{{ __('home.no_videos') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -317,8 +321,9 @@
             {{-- Albums row --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                 <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2 flex items-center justify-between">
-                    <span>ফটো গ্যালারী</span>
-                    <a href="{{ route('client.gallery.index') }}" class="text-xs text-white/90 hover:text-white">সকল</a>
+                    <span>{{ __('home.photo_gallery') }}</span>
+                    <a href="{{ route('client.gallery.index') }}"
+                        class="text-xs text-white/90 hover:text-white">{{ __('home.all') }}</a>
                 </div>
 
                 <div class="p-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -326,11 +331,11 @@
                         <a href="{{ route('client.gallery.album', $album->id) }}"
                             class="border rounded p-4 hover:bg-slate-50">
                             <div class="text-sm font-semibold text-slate-800 line-clamp-2">{{ $album->title }}</div>
-                            <div class="text-xs text-slate-500 mt-2">অ্যালবাম দেখুন</div>
+                            <div class="text-xs text-slate-500 mt-2">{{ __('home.album_view') }}</div>
                         </a>
                     @empty
                         <div class="sm:col-span-2 lg:col-span-3 text-sm text-slate-500">
-                            No gallery album found.
+                            {{ __('home.no_albums') }}
                         </div>
                     @endforelse
                 </div>
@@ -342,7 +347,8 @@
 
             {{-- Important links --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">গুরুত্বপূর্ণ লিংক</div>
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">{{ __('home.important_links') }}
+                </div>
 
                 <div class="divide-y">
                     @if (count($quickLinks))
@@ -368,14 +374,14 @@
 
                 <div class="p-3">
                     <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">
-                        সকল
+                        {{ __('home.all') }}
                     </a>
                 </div>
             </div>
 
             {{-- Internal links --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">অভ্যন্তরীণ লিংকসমূহ</div>
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">{{ __('home.internal_links') }}</div>
 
                 <div class="divide-y text-sm">
                     @foreach ($internalItems as $item)
@@ -388,47 +394,50 @@
                 </div>
 
                 <div class="p-3">
-                    <a href="#" class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">সকল</a>
+                    <a href="#"
+                        class="block text-center border rounded px-3 py-2 text-sm hover:bg-slate-50">{{ __('home.all') }}</a>
                 </div>
             </div>
 
             {{-- Helpline --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">সরকারি হেল্পলাইন</div>
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">{{ __('home.helpline') }}</div>
 
                 <div class="p-3 space-y-2">
                     <div class="border rounded p-2 flex items-center justify-between text-sm">
-                        <span>জাতীয় সেবা</span><span class="font-bold text-emerald-700">333</span>
+                        <span>{{ __('home.national_service') }}</span><span class="font-bold text-emerald-700">333</span>
                     </div>
                     <div class="border rounded p-2 flex items-center justify-between text-sm">
-                        <span>জরুরি সেবা</span><span class="font-bold text-rose-600">999</span>
+                        <span>{{ __('home.emergency_service') }}</span><span class="font-bold text-rose-600">999</span>
                     </div>
                     <div class="border rounded p-2 flex items-center justify-between text-sm">
-                        <span>নারী ও শিশু</span><span class="font-bold text-amber-700">109</span>
+                        <span>{{ __('home.women_children') }}</span><span class="font-bold text-amber-700">109</span>
                     </div>
                     <div class="border rounded p-2 flex items-center justify-between text-sm">
-                        <span>দুদক</span><span class="font-bold text-sky-700">106</span>
+                        <span>{{ __('home.dudok') }}</span><span class="font-bold text-sky-700">106</span>
                     </div>
                 </div>
             </div>
 
             {{-- Facebook --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">জাতীয় ফেসবুক পেজ</div>
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">
+                    {{ __('home.national_facebook_page') }}</div>
 
                 <div class="p-3">
                     <div class="border rounded bg-[#f5f8ff] p-6 text-center">
                         <div class="text-3xl mb-2">📘</div>
-                        <div class="font-semibold text-slate-700">Follow us on Facebook</div>
+                        <div class="font-semibold text-slate-700">{{ __('home.follow_facebook') }}</div>
                     </div>
                 </div>
             </div>
 
             {{-- Visitor --}}
             <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">ভিজিটর কাউন্টার</div>
+                <div class="bg-[#0b8f3a] text-white text-sm font-semibold px-3 py-2">{{ __('home.visitor_counter') }}
+                </div>
                 <div class="p-3 text-sm text-slate-600">
-                    <div class="border rounded p-3 text-center">ভিজিটর ইনফরমেশন মডিউল</div>
+                    <div class="border rounded p-3 text-center">{{ __('home.visitor_information_module') }}</div>
                 </div>
             </div>
         </div>
